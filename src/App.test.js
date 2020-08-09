@@ -1,10 +1,9 @@
 import React from "react";
-import { render } from "@testing-library/react";
-import App from "./App";
 import { shallow } from "enzyme";
+import { findByTestAtrr, checkProps } from "./../Utils/index";
+
 import Header from "./component/header/header";
 import HeadLine from "./component/headline/headline";
-import { findByTestAtrr } from "./../Utils/index";
 
 import { configure } from "enzyme";
 import Adapter from "enzyme-adapter-react-16";
@@ -77,6 +76,27 @@ describe("Headline Component", () => {
     it("Should not render", () => {
       const component = findByTestAtrr(wrapper, "HeadlineComponent");
       expect(component.length).toBe(0);
+    });
+  });
+
+  describe("Checking PropTypes", () => {
+    it("Should not throw a warning", () => {
+      const expectedProps = {
+        header: "Test Header",
+        desc: "Test Desc",
+        tempArr: [
+          {
+            fName: "Test fName",
+            lName: "Test lName",
+            email: "Test email",
+            age: 23,
+            onlineStatus: true,
+          },
+        ],
+      };
+
+      const propsErr = checkProps(HeadLine, expectedProps);
+      expect(propsErr).toBeUndefined();
     });
   });
 });
