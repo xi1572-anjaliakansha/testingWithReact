@@ -5,6 +5,9 @@ import { findByTestAtrr, checkProps } from "./../Utils/index";
 import Header from "./component/header/header";
 import HeadLine from "./component/headline/headline";
 
+import { types } from "./actions/types";
+import postReducer from "./reducers/posts/reducer";
+
 import { configure } from "enzyme";
 import Adapter from "enzyme-adapter-react-16";
 configure({ adapter: new Adapter() });
@@ -98,5 +101,23 @@ describe("Headline Component", () => {
       const propsErr = checkProps(HeadLine, expectedProps);
       expect(propsErr).toBeUndefined();
     });
+  });
+});
+
+/////////////////////REDUCERS STATE////////////
+describe("Post Reducers", () => {
+  it("Should return default state", () => {
+    const newState = postReducer(undefined, {});
+    expect(newState).toEqual([]);
+  });
+
+  it("Should return new state if recieving type", () => {
+    const posts = [{ title: "Test 1" }, { title: "Test 2" }];
+
+    const newState = postReducer(undefined, {
+      type: types.GET_POSTS,
+      payload: posts,
+    });
+    expect(newState).toEqual(posts);
   });
 });
