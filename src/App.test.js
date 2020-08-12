@@ -4,6 +4,8 @@ import { findByTestAtrr, checkProps } from "./../Utils/index";
 
 import Header from "./component/header/header";
 import HeadLine from "./component/headline/headline";
+import SharedButton from "./component/button/button";
+import ListItem from "./component/listItem/ListItem";
 
 import { types } from "./actions/types";
 import postReducer from "./reducers/posts/reducer";
@@ -119,5 +121,135 @@ describe("Post Reducers", () => {
       payload: posts,
     });
     expect(newState).toEqual(posts);
+  });
+});
+
+///////////////////BUTTON COMPONENT//////////////////
+
+describe("Shared Component", () => {
+  describe("Checking PropTypes", () => {
+    it("Should NOT throw a warning", () => {
+      const expectedProps = {
+        buttonText: "Example Button Text",
+        emitEvent: () => {},
+      };
+      const propsError = checkProps(SharedButton, expectedProps);
+      expect(propsError).toBeUndefined();
+    });
+  });
+
+  describe("Render", () => {
+    let wrapper;
+    beforeEach(() => {
+      const props = {
+        buttonText: "Example Button Text",
+        emitEvent: () => {},
+      };
+      wrapper = shallow(<SharedButton {...props} />);
+    });
+    it("Should render button", () => {
+      const button = findByTestAtrr(wrapper, "buttonComponent");
+      expect(button.length).toBe(1);
+    });
+  });
+});
+
+///////////////////////////LIST ITEM STYLES////////////////
+describe("ListItem Component", () => {
+  describe("Checking PropTypes", () => {
+    it("Should not throw a warning", () => {
+      const expectedProps = {
+        title: "Example Title",
+        desc: "Example desc",
+      };
+      const propsError = checkProps(ListItem, expectedProps);
+      expect(propsError).toBeUndefined();
+    });
+  });
+
+  describe("Component Renders", () => {
+    let wrapper;
+    beforeEach(() => {
+      const props = {
+        title: "Example Title",
+        desc: "Some text",
+      };
+      wrapper = shallow(<ListItem {...props} />);
+    });
+    it("Should render without error", () => {
+      const component = findByTestAtrr(wrapper, "listItemComponent");
+      expect(component.length).toBe(1);
+    });
+
+    it("Should render a title", () => {
+      const title = findByTestAtrr(wrapper, "componentTitle");
+      expect(title.length).toBe(1);
+    });
+
+    it("Should render a desc", () => {
+      const desc = findByTestAtrr(wrapper, "componentDesc");
+      expect(desc.length).toBe(1);
+    });
+  });
+
+  describe("Should NOT render", () => {
+    let wrapper;
+    beforeEach(() => {
+      const props = {
+        desc: "Some text",
+      };
+      wrapper = shallow(<ListItem {...props} />);
+    });
+
+    it("Component is not rendered", () => {
+      const component = findByTestAtrr(wrapper, "listItemComponent");
+      expect(component.length).toBe(0);
+    });
+  });
+});
+
+//////////////////////////////INTEGRATION TEST///////////////////////////////////////////
+import moxios from "moxios";
+import { testStore } from "./../Utils/index";
+import { fetchPosts } from "./../src/actions/index";
+
+describe("fetchPosts action", () => {
+  beforeEach(() => {
+    moxios.install();
+  });
+
+  afterEach(() => {
+    moxios.uninstall();
+  });
+
+  test("Store is updated correctly", () => {
+    const expectedState = [
+      {
+        title: "Example title 1",
+        body: "Some Text",
+      },
+      {
+        title: "Example title 2",
+        body: "Some Text",
+      },
+      {
+        title: "Example title 3",
+        body: "Some Text",
+      },
+    ];
+    const store = testStore();
+
+    moxios.wait(() => {
+      const request = moxios.requests.mostRecent();
+      request.respondWith({
+        status: 200,
+        response: expectedState,
+      });
+    });
+
+    return store.dispatch(fetchPosts()).then(() => {
+      const newState = store.getState();
+      expect(newState.posts).toBe(expectedState);
+    });
   });
 });
