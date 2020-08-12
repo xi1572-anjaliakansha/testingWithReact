@@ -5,6 +5,7 @@ import { findByTestAtrr, checkProps } from "./../Utils/index";
 import Header from "./component/header/header";
 import HeadLine from "./component/headline/headline";
 import SharedButton from "./component/button/button";
+import App from "./App";
 import ListItem from "./component/listItem/ListItem";
 
 import { types } from "./actions/types";
@@ -251,5 +252,37 @@ describe("fetchPosts action", () => {
       const newState = store.getState();
       expect(newState.posts).toBe(expectedState);
     });
+  });
+});
+///////////////////////////////CONNECTED COMPONENT////////////////////////////////////////////////
+const setUP = (initialState = {}) => {
+  const store = testStore(initialState);
+  const wrapper = shallow(<App store={store} />)
+    .childAt(0)
+    .dive();
+  return wrapper;
+};
+
+describe("App Component", () => {
+  let wrapper;
+  beforeEach(() => {
+    const initialState = {
+      posts: [
+        {
+          title: "Example title1",
+          body: "Some text",
+        },
+        {
+          title: "Example title2",
+          body: "Some text",
+        },
+      ],
+    };
+    wrapper = setUP(initialState);
+  });
+
+  it("Should render without errors", () => {
+    const component = findByTestAtrr(wrapper, "appComponent");
+    expect(component.length).toBe(1);
   });
 });
